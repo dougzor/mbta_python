@@ -235,14 +235,3 @@ class MBTASDK(object):
         response = requests.get(url, params=params)
 
         return TripSchedule(response.json())
-
-
-if __name__ == "__main__":
-    import pprint
-    sdk = MBTASDK("wX9NwuHnZU2ToO7GmGR9uw")
-    for stop in sdk.get_stops_by_location(42.395129, -71.142573):
-        print stop.to_primitive()
-
-    pprint.pprint(sdk.get_routes_by_stop("place-alfcl").to_primitive())
-
-    pprint.pprint(sdk.get_schedules_by_stop("2494", "76", "1").to_primitive())
