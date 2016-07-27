@@ -65,6 +65,7 @@ class Mode(Model):
 
 class StopWithMode(Stop):
     mode = ListType(ModelType(Mode))
+    alert_headers = ListType(ModelType(Alert))
 
 
 class TripSchedule(Model):
