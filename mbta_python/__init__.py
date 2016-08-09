@@ -1,5 +1,6 @@
 import requests
-from mbta_python.models import Stop, Direction, StopWithMode, Mode, TripSchedule, Alert
+from mbta_python.models import Stop, Direction, StopWithMode, Mode, \
+    TripSchedule, Alert
 
 
 HOST = "http://realtime.mbta.com/developer/api/v2"
@@ -61,18 +62,26 @@ class MBTASDK(object):
 
         return StopWithMode(response.json())
 
-    def get_schedules_by_stop(self, stop_id, route_id=None, direction_id=None, date=None,
-                              max_time=None, max_trips=None):
-        """Return scheduled arrivals and departures for a direction and route for a particular stop.
+    def get_schedules_by_stop(self, stop_id, route_id=None, direction_id=None,
+                              date=None, max_time=None, max_trips=None):
+        """Return scheduled arrivals and departures for a direction and route for a
+        particular stop.
+
         stop_id - Stop ID
-        route_id - Route ID, If not included then schedule for all routes serving the stop will be returned,
-        direction_id - Direction ID, If included then route must also be included if not included then schedule
-                    for all directions of the route serving the stop will be returned
-        date - Time after which schedule should be returned. If included then must be within the next seven (7) days
-               If not included then schedule starting from the current datetime will be returned
-        max_time - Defines maximum range of time (in minutes) within which trips will be returned.
-                   If not included defaults to 60.
-        max_trips - Defines number of trips to return. Integer between 1 and 100. If not included defaults to 5.
+        route_id - Route ID, If not included then schedule for all routes
+                   serving the stop will be returned,
+        direction_id - Direction ID, If included then route must also be
+                       included if not included then schedule for all
+                       directions of the route serving the stop will be
+                       returned
+        date - Time after which schedule should be returned. If included
+               then must be within the next seven (7) days
+               If not included then schedule starting from the current
+               datetime will be returned
+        max_time - Defines maximum range of time (in minutes) within which
+                   trips will be returned. If not included defaults to 60.
+        max_trips - Defines number of trips to return. Integer between 1 and
+                    100. If not included defaults to 5.
         """
         url = "{}/schedulebystop".format(HOST)
         params = {
@@ -90,14 +99,20 @@ class MBTASDK(object):
 
         return StopWithMode(response.json())
 
-    def get_schedules_by_routes(self, route_ids, date=None, max_time=None, max_trips=None):
-        """Return the scheduled arrivals and departures in a direction for a particular route or routes.
+    def get_schedules_by_routes(self, route_ids, date=None,
+                                max_time=None, max_trips=None):
+        """Return the scheduled arrivals and departures in a direction
+        for a particular route or routes.
+
         route_ids - List of Route IDs, or single Route ID
-        date - Time after which schedule should be returned. If included then must be within the next seven (7) days
-               If not included then schedule starting from the current datetime will be returned
-        max_time - Defines maximum range of time (in minutes) within which trips will be returned.
-                   If not included defaults to 60.
-        max_trips - Defines number of trips to return. Integer between 1 and 100. If not included defaults to 5.
+        date - Time after which schedule should be returned. If included
+               then must be within the next seven (7) days If not included
+               then schedule starting from the current datetime will
+               be returned
+        max_time - Defines maximum range of time (in minutes) within which
+                   trips will be returned. If not included defaults to 60.
+        max_trips - Defines number of trips to return. Integer between 1
+                    and 100. If not included defaults to 5.
         """
         url = "{}/schedulebyroutes".format(HOST)
 
@@ -117,13 +132,17 @@ class MBTASDK(object):
         return [Mode(m) for m in response.json()["mode"]]
 
     def get_schedules_by_trip(self, trip_id, date=None):
-        """Return the scheduled arrivals and departures in a direction for a particular route or routes.
+        """Return the scheduled arrivals and departures in a direction
+        for a particular route or routes.
+
         route_ids - List of Route IDs, or single Route ID
-        date - Time after which schedule should be returned. If included then must be within the next seven (7) days
-               If not included then schedule starting from the current datetime will be returned
-        max_time - Defines maximum range of time (in minutes) within which trips will be returned.
-                   If not included defaults to 60.
-        max_trips - Defines number of trips to return. Integer between 1 and 100. If not included defaults to 5.
+        date - Time after which schedule should be returned. If included then
+               must be within the next seven (7) days. If not included then
+               schedule starting from the current datetime will be returned
+        max_time - Defines maximum range of time (in minutes) within which
+                   trips will be returned. If not included defaults to 60.
+        max_trips - Defines number of trips to return. Integer between 1 and
+                    100. If not included defaults to 5.
         """
         url = "{}/schedulebytrip".format(HOST)
 
@@ -137,12 +156,17 @@ class MBTASDK(object):
 
         return TripSchedule(response.json())
 
-    def get_predictions_by_stop(self, stop_id, include_access_alerts=False, include_service_alerts=True):
-        """Return predicted arrivals and departures in the next hour for a direction and route for a particular stop.
+    def get_predictions_by_stop(self, stop_id, include_access_alerts=False,
+                                include_service_alerts=True):
+        """Return predicted arrivals and departures in the next hour for a
+        direction and route for a particular stop.
+
         stop_id - Stop ID
-        include_access_alerts - Whether or not alerts pertaining to accessibility (elevators, escalators)
-                                should be returned
-        include_service_alerts - Whether or not service alerts should be returned
+        include_access_alerts - Whether or not alerts pertaining to
+                                accessibility (elevators, escalators) should be
+                                returned
+        include_service_alerts - Whether or not service alerts should be
+                                 returned
         """
         url = "{}/predictionsbystop".format(HOST)
 
@@ -157,13 +181,17 @@ class MBTASDK(object):
 
         return StopWithMode(response.json())
 
-    def get_predictions_by_routes(self, route_ids, include_access_alerts=False, include_service_alerts=True):
-        """Return predictions for upcoming trips (including trips already underway) in a direction for a
-           particular route or routes.
+    def get_predictions_by_routes(self, route_ids, include_access_alerts=False,
+                                  include_service_alerts=True):
+        """Return predictions for upcoming trips (including trips already underway)
+        in a direction for a particular route or routes.
+
         route_ids - List of Route IDs, or single Route ID
-        include_access_alerts - Whether or not alerts pertaining to accessibility (elevators, escalators)
-                                should be returned
-        include_service_alerts - Whether or not service alerts should be returned
+        include_access_alerts - Whether or not alerts pertaining to
+                                accessibility (elevators, escalators) should be
+                                returned
+        include_service_alerts - Whether or not service alerts should be
+                                 returned
         """
         url = "{}/predictionsbyroutes".format(HOST)
         if not isinstance(route_ids, list):
@@ -183,13 +211,17 @@ class MBTASDK(object):
 
         return modes, alerts
 
-    def get_vehicles_by_routes(self, route_ids, include_access_alerts=False, include_service_alerts=True):
-        """Return vehicle positions for upcoming trips (including trips already underway) in a direction for a
-           particular route or routes.
+    def get_vehicles_by_routes(self, route_ids, include_access_alerts=False,
+                               include_service_alerts=True):
+        """Return vehicle positions for upcoming trips (including trips already
+        underway) in a direction for a particular route or routes.
+
         route_ids - List of Route IDs, or single Route ID
-        include_access_alerts - Whether or not alerts pertaining to accessibility (elevators, escalators)
-                                should be returned
-        include_service_alerts - Whether or not service alerts should be returned
+        include_access_alerts - Whether or not alerts pertaining to
+                                accessibility (elevators, escalators) should be
+                                returned
+        include_service_alerts - Whether or not service alerts should be
+                                 returned
         """
         url = "{}/vehiclesbyroutes".format(HOST)
         if not isinstance(route_ids, list):
