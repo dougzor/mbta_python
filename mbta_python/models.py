@@ -11,6 +11,7 @@ class Stop(Model):
     stop_lat = StringType(required=True)
     stop_lon = StringType(required=True)
     distance = StringType()
+    stop_order = StringType()
 
 
 class Alert(Model):

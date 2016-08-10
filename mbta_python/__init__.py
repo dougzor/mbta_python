@@ -40,7 +40,7 @@ class MBTASDK(object):
         """
         url = "{}/stopsbyroute".format(HOST)
         params = {
-            "route_id": route_id,
+            "route": route_id,
             "api_key": self.api_key,
             "format": "json"
         }
