@@ -1,13 +1,15 @@
+import datetime
 import requests
-from mbta_python.models import Stop, Direction, StopWithMode, Mode, \
-    TripSchedule, Alert
+from mbta_python.models import Stop, Direction, Schedule, Mode, \
+    TripSchedule, Alert, StopWithMode
 
 
 HOST = "http://realtime.mbta.com/developer/api/v2"
 
 
 def datetime_to_epoch(dt):
-    return None
+    epoch = datetime.datetime.utcfromtimestamp(0)
+    return int((dt - epoch).total_seconds())
 
 
 class MBTASDK(object):
@@ -16,11 +18,22 @@ class MBTASDK(object):
     def __init__(self, api_key):
         self.api_key = api_key
 
+    def _make_request(self, path, params):
+        url = "{}/{}".format(HOST, path)
+        response = requests.get(url, params=params)
+
+        data = response.json()
+
+        error = data.get("error")
+        if error:
+            raise Exception(error["message"])
+
+        return response.json()
+
     def get_stops_by_location(self, latitude, longitude):
         """Get a List of Stops sorted by proximity to the given
         latitude and longitude
         """
-        url = "{}/stopsbylocation".format(HOST)
         params = {
             "lat": latitude,
             "lon": longitude,
@@ -28,9 +41,9 @@ class MBTASDK(object):
             "format": "json"
         }
 
-        response = requests.get(url, params=params)
+        data = self._make_request("stopsbylocation", params)
 
-        stops = [Stop(stop_data) for stop_data in response.json()["stop"]]
+        stops = [Stop(stop_data) for stop_data in data["stop"]]
 
         return stops
 
@@ -38,29 +51,27 @@ class MBTASDK(object):
         """Return a List of Directions for the route_id
         that contain a list of Stops that Direction and Route serve
         """
-        url = "{}/stopsbyroute".format(HOST)
         params = {
             "route": route_id,
             "api_key": self.api_key,
             "format": "json"
         }
 
-        response = requests.get(url, params=params)
+        data = self._make_request("stopsbyroute", params)
 
-        return [Direction(d) for d in response.json()["direction"]]
+        return [Direction(d) for d in data["direction"]]
 
-    def get_routes_by_stop(self, stop_id, include_schedules=False):
+    def get_routes_by_stop(self, stop_id):
         """Return a list of routes that serve a particular stop
         """
-        url = "{}/routesbystop".format(HOST)
         params = {
             "stop": stop_id,
             "api_key": self.api_key,
             "format": "json"
         }
-        response = requests.get(url, params=params)
+        data = self._make_request("routesbystop", params)
 
-        return StopWithMode(response.json())
+        return StopWithMode(data)
 
     def get_schedules_by_stop(self, stop_id, route_id=None, direction_id=None,
                               date=None, max_time=None, max_trips=None):
@@ -83,21 +94,20 @@ class MBTASDK(object):
         max_trips - Defines number of trips to return. Integer between 1 and
                     100. If not included defaults to 5.
         """
-        url = "{}/schedulebystop".format(HOST)
         params = {
             "stop": stop_id,
             "api_key": self.api_key,
             "format": "json",
             "route": route_id,
             "direction": direction_id,
-            "datetime": date,
+            "date": datetime_to_epoch(date) if date else None,
             "max_time": max_time,
             "max_trips": max_trips
         }
 
-        response = requests.get(url, params=params)
+        data = self._make_request("schedulebystop", params)
 
-        return StopWithMode(response.json())
+        return Schedule(data)
 
     def get_schedules_by_routes(self, route_ids, date=None,
                                 max_time=None, max_trips=None):
@@ -123,7 +133,7 @@ class MBTASDK(object):
             "routes": ",".join(route_ids),
             "api_key": self.api_key,
             "format": "json",
-            "datetime": date,
+            "datetime": datetime_to_epoch(date) if date else None,
             "max_time": max_time,
             "max_trips": max_trips
         }
@@ -150,7 +160,7 @@ class MBTASDK(object):
             "trip": trip_id,
             "api_key": self.api_key,
             "format": "json",
-            "datetime": date
+            "datetime": datetime_to_epoch(date) if date else None,
         }
         response = requests.get(url, params=params)
 

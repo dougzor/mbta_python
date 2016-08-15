@@ -12,6 +12,9 @@ class Stop(Model):
     stop_lon = StringType(required=True)
     distance = StringType()
     stop_order = StringType()
+    sch_arr_dt = IntType()
+    sch_dep_dt = IntType()
+    stop_sequence = StringType()
 
 
 class Alert(Model):
@@ -34,8 +37,8 @@ class Trip(Model):
     trip_name = StringType(required=True)
     trip_headsign = StringType()
 
-    sch_arr_dt = IntType(required=True)
-    sch_dep_dt = IntType(required=True)
+    sch_arr_dt = IntType()
+    sch_dep_dt = IntType()
 
     pre_dt = StringType()
     pre_away = IntType()
@@ -65,6 +68,18 @@ class Mode(Model):
 
 
 class StopWithMode(Stop):
+    mode = ListType(ModelType(Mode))
+
+
+class Schedule(Model):
+    stop_id = StringType(required=True)
+    stop_name = StringType(required=True)
+    parent_station = StringType()
+    parent_station_name = StringType()
+    stop_lat = StringType(required=True)
+    stop_lon = StringType(required=True)
+    distance = StringType()
+    stop_order = StringType()
     mode = ListType(ModelType(Mode))
     alert_headers = ListType(ModelType(Alert))
 
