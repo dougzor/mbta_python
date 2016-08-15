@@ -66,8 +66,11 @@ class MBTATests(unittest.TestCase):
         from mbta_python.models import Schedule
         sdk = MBTASDK(TEST_API_KEY)
 
-        schedule = sdk.get_schedules_by_stop("place-alfcl",
-                                             direction_id="1")
+        schedule = sdk.get_schedules_by_stop(
+            "place-alfcl",
+            date=self.next_wednesday,
+            direction_id="1"
+        )
 
         self.assertIsInstance(schedule, Schedule)
 
@@ -83,3 +86,71 @@ class MBTATests(unittest.TestCase):
 
         for schedule in schedules:
             self.assertIsInstance(schedule, Mode)
+
+    def test_get_schedules_by_trip(self):
+        from mbta_python import MBTASDK
+        from mbta_python.models import TripSchedule
+        sdk = MBTASDK(TEST_API_KEY)
+
+        trip = sdk.get_schedules_by_trip(
+            "31127964-CR_MAY2016-hxp16011-Weekday-01",
+            date=self.next_wednesday
+        )
+
+        self.assertIsInstance(trip, TripSchedule)
+
+    def test_get_predictions_by_stop(self):
+        from mbta_python import MBTASDK
+        from mbta_python.models import Prediction
+        sdk = MBTASDK(TEST_API_KEY)
+
+        prediction = sdk.get_predictions_by_stop(
+            "place-alfcl"
+        )
+
+        self.assertIsInstance(prediction, Prediction)
+
+    def test_get_predictions_by_routes(self):
+        from mbta_python import MBTASDK
+        from mbta_python.models import Prediction
+        sdk = MBTASDK(TEST_API_KEY)
+
+        prediction = sdk.get_predictions_by_routes(
+            "31127964-CR_MAY2016-hxp16011-Weekday-01"
+        )
+
+        self.assertIsInstance(prediction, Prediction)
+
+    def test_get_vehicles_by_routes(self):
+        from mbta_python import MBTASDK
+        from mbta_python.models import Mode
+        sdk = MBTASDK(TEST_API_KEY)
+
+        schedules = sdk.get_schedules_by_routes(
+            ["116", "117"]
+        )
+
+        for schedule in schedules:
+            self.assertIsInstance(schedule, Mode)
+
+    def test_get_predictions_by_trip(self):
+        from mbta_python import MBTASDK
+        from mbta_python.models import TripSchedule
+        sdk = MBTASDK(TEST_API_KEY)
+
+        schedule = sdk.get_predictions_by_trip(
+            "31285826"
+        )
+
+        self.assertIsInstance(schedule, TripSchedule)
+
+    def test_get_vehicles_by_trip(self):
+        from mbta_python import MBTASDK
+        from mbta_python.models import TripSchedule
+        sdk = MBTASDK(TEST_API_KEY)
+
+        schedule = sdk.get_vehicles_by_trip(
+            "31285826"
+        )
+
+        self.assertIsInstance(schedule, TripSchedule)

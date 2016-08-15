@@ -71,6 +71,13 @@ class StopWithMode(Stop):
     mode = ListType(ModelType(Mode))
 
 
+class Prediction(Model):
+    stop_id = StringType(required=True)
+    stop_name = StringType(required=True)
+    mode = ListType(ModelType(Mode))
+    alert_headers = ListType(ModelType(Alert))
+
+
 class Schedule(Model):
     stop_id = StringType(required=True)
     stop_name = StringType(required=True)

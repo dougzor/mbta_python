@@ -1,7 +1,7 @@
 import datetime
 import requests
 from mbta_python.models import Stop, Direction, Schedule, Mode, \
-    TripSchedule, Alert, StopWithMode
+    TripSchedule, Alert, StopWithMode, Prediction
 
 
 HOST = "http://realtime.mbta.com/developer/api/v2"
@@ -100,7 +100,7 @@ class MBTASDK(object):
             "format": "json",
             "route": route_id,
             "direction": direction_id,
-            "date": datetime_to_epoch(date) if date else None,
+            "datetime": datetime_to_epoch(date) if date else None,
             "max_time": max_time,
             "max_trips": max_trips
         }
@@ -124,10 +124,8 @@ class MBTASDK(object):
         max_trips - Defines number of trips to return. Integer between 1
                     and 100. If not included defaults to 5.
         """
-        url = "{}/schedulebyroutes".format(HOST)
-
         if not isinstance(route_ids, list):
-            route_ids = list(route_ids)
+            route_ids = [route_ids]
 
         params = {
             "routes": ",".join(route_ids),
@@ -137,9 +135,9 @@ class MBTASDK(object):
             "max_time": max_time,
             "max_trips": max_trips
         }
-        response = requests.get(url, params=params)
+        data = self._make_request("schedulebyroutes", params)
 
-        return [Mode(m) for m in response.json()["mode"]]
+        return [Mode(m) for m in data["mode"]]
 
     def get_schedules_by_trip(self, trip_id, date=None):
         """Return the scheduled arrivals and departures in a direction
@@ -154,17 +152,15 @@ class MBTASDK(object):
         max_trips - Defines number of trips to return. Integer between 1 and
                     100. If not included defaults to 5.
         """
-        url = "{}/schedulebytrip".format(HOST)
-
         params = {
             "trip": trip_id,
             "api_key": self.api_key,
             "format": "json",
             "datetime": datetime_to_epoch(date) if date else None,
         }
-        response = requests.get(url, params=params)
+        data = self._make_request("schedulebytrip", params)
 
-        return TripSchedule(response.json())
+        return TripSchedule(data)
 
     def get_predictions_by_stop(self, stop_id, include_access_alerts=False,
                                 include_service_alerts=True):
@@ -178,8 +174,6 @@ class MBTASDK(object):
         include_service_alerts - Whether or not service alerts should be
                                  returned
         """
-        url = "{}/predictionsbystop".format(HOST)
-
         params = {
             "stop": stop_id,
             "api_key": self.api_key,
@@ -187,9 +181,9 @@ class MBTASDK(object):
             "include_access_alerts": include_access_alerts,
             "include_service_alerts": include_service_alerts
         }
-        response = requests.get(url, params=params)
+        data = self._make_request("predictionsbystop", params)
 
-        return StopWithMode(response.json())
+        return Prediction(data)
 
     def get_predictions_by_routes(self, route_ids, include_access_alerts=False,
                                   include_service_alerts=True):
@@ -203,9 +197,8 @@ class MBTASDK(object):
         include_service_alerts - Whether or not service alerts should be
                                  returned
         """
-        url = "{}/predictionsbyroutes".format(HOST)
         if not isinstance(route_ids, list):
-            route_ids = list(route_ids)
+            route_ids = [route_ids]
 
         params = {
             "routes": ",".join(route_ids),
@@ -214,12 +207,9 @@ class MBTASDK(object):
             "include_access_alerts": include_access_alerts,
             "include_service_alerts": include_service_alerts
         }
-        response = requests.get(url, params=params)
+        data = self._make_request("predictionsbyroutes", params)
 
-        modes = [Mode(m) for m in response.json["mode"]]
-        alerts = [Alert(a) for a in response.json["alert_headers"]]
-
-        return modes, alerts
+        return Prediction(data)
 
     def get_vehicles_by_routes(self, route_ids, include_access_alerts=False,
                                include_service_alerts=True):
@@ -233,9 +223,8 @@ class MBTASDK(object):
         include_service_alerts - Whether or not service alerts should be
                                  returned
         """
-        url = "{}/vehiclesbyroutes".format(HOST)
         if not isinstance(route_ids, list):
-            route_ids = list(route_ids)
+            route_ids = [route_ids]
 
         params = {
             "routes": ",".join(route_ids),
@@ -244,36 +233,32 @@ class MBTASDK(object):
             "include_access_alerts": include_access_alerts,
             "include_service_alerts": include_service_alerts
         }
-        response = requests.get(url, params=params)
+        data = self._make_request("vehiclesbyroutes", params)
 
-        return [Mode(m) for m in response.json["mode"]]
+        return [Mode(m) for m in data]
 
     def get_predictions_by_trip(self, trip_id):
         """Return the predicted arrivals and departures for a particular trip.
         trip_id - TripID
         """
-        url = "{}/predictionsbytrip".format(HOST)
-
         params = {
             "trip": trip_id,
             "api_key": self.api_key,
             "format": "json"
         }
-        response = requests.get(url, params=params)
+        data = self._make_request("predictionsbytrip", params)
 
-        return TripSchedule(response.json())
+        return TripSchedule(data)
 
     def get_vehicles_by_trip(self, trip_id):
         """Return the predicted vehicle positions for a particular trip.
         trip_id - TripID
         """
-        url = "{}/vehiclesbytrip".format(HOST)
-
         params = {
             "trip": trip_id,
             "api_key": self.api_key,
             "format": "json"
         }
-        response = requests.get(url, params=params)
+        data = self._make_request("vehiclesbytrip", params)
 
-        return TripSchedule(response.json())
+        return TripSchedule(data)
