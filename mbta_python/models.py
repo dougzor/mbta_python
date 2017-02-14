@@ -30,6 +30,7 @@ class Vehicle(Model):
     vehicle_bearing = IntType(required=True)
     vehicle_speed = IntType(required=True)
     vehicle_timestamp = IntType(required=True)
+    vehicle_label = StringType()
 
 
 class Trip(Model):

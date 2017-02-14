@@ -11,7 +11,7 @@ with open(os.path.join(here, 'requirements.txt')) as f:
 
 setup(
     name='MBTA Python Library',
-    version="0.1",
+    version="0.1.1",
     description='MBTA Python Library',
     author='Doug Morgan',
     author_email='doug.morgan@gmail.com',
